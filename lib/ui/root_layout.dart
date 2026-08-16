@@ -18,8 +18,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive_ce/hive.dart';
+import 'package:hive_ce_flutter/adapters.dart';
+import 'package:scanbox_connect/models/account.dart';
+import 'package:scanbox_connect/ui/explorer.dart';
 import 'package:scanbox_connect/ui/homepage.dart';
 import 'package:scanbox_connect/ui/settings.dart';
+import 'package:collection/collection.dart';
 
 class RootLayout extends StatefulWidget {
   const RootLayout({super.key});
@@ -30,9 +35,18 @@ class RootLayout extends StatefulWidget {
 class _RootLayoutState extends State<RootLayout> {
   int _selectedPage = 0;
 
-  final List<Widget> pages = [
+  Box<Account> accountBox = Hive.box<Account>("accounts");
+
+  @override
+  void initState() {
+
+    super.initState();
+  }
+
+
+  List<Widget> pages = [
     Homepage(),
-    Homepage(),
+    ExplorerPage(),
   ];
   
   AppBar get appBar => AppBar(
@@ -46,7 +60,7 @@ class _RootLayoutState extends State<RootLayout> {
     onTap: (int i) => setState(() => _selectedPage = i),
     items: [
       BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-      BottomNavigationBarItem(icon: Icon(Icons.library_add),label: "Library"),
+      BottomNavigationBarItem(icon: Icon(Icons.explore),label: "Explorer"),
     ]
   );
 
@@ -55,13 +69,17 @@ class _RootLayoutState extends State<RootLayout> {
     onPressed: () => ()
   );
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar,
       bottomNavigationBar: btmNavBar,
       floatingActionButton: fab,
-      body: pages[_selectedPage],
+      body: IndexedStack(
+      index: _selectedPage,
+      children: pages,
+      )
     );
   }
 }

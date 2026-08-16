@@ -17,10 +17,39 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
+import 'package:hive_ce/hive.dart';
+import 'package:hive_ce_flutter/adapters.dart';
+import 'package:logging/logging.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:scanbox_connect/hive/hive_registrar.g.dart';
+import 'package:scanbox_connect/models/account.dart';
 import 'package:scanbox_connect/ui/root_layout.dart';
+import 'package:path/path.dart' as p;
 
-void main() {
+void main() async {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  Logger.root.level = Level.ALL; // defaults to Level.INFO
+  Logger.root.onRecord.listen((record) {
+    print('${record.level.name}: ${record.time}: ${record.message}');
+  });
+
+
+  if (GetPlatform.isMacOS) {
+    Hive
+      ..init(
+          p.join((await getApplicationSupportDirectory()).toString(), "hive"))
+      ..registerAdapters();
+  } else {
+    await Hive.initFlutter();
+    Hive.registerAdapters();
+  }
+  await Hive.openBox<Account>("accounts");
+
+  FlutterNativeSplash.remove();
   runApp(const ScanboxConnect());
 }
 

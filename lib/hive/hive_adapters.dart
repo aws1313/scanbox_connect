@@ -1,0 +1,28 @@
+/*
+ScanboxConnect: mobile app to integrate with Homebox and other self-hosted services such as Jellyfin
+Copyright (C) 2026 aws1313
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+import 'package:hive_ce/hive_ce.dart';
+
+import 'package:scanbox_connect/models/account.dart';
+
+@GenerateAdapters([
+  AdapterSpec<AccountType>(),
+  AdapterSpec<LoginType>(),
+  AdapterSpec<Account>()
+])
+part 'hive_adapters.g.dart';
