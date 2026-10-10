@@ -17,15 +17,21 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 import 'package:collection/collection.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:hive_ce_flutter/adapters.dart';
 import 'package:scanbox_connect/api/homebox.dart';
 import 'package:scanbox_connect/models/account.dart';
+import 'package:scanbox_connect/models/scanner.dart';
+import 'package:scanbox_connect/platform/hardware_scanner.dart';
 
 
 class Homepage extends StatefulWidget {
-  const Homepage({super.key});
+  final bool isSelected;
+
+  const Homepage({required this.isSelected, super.key});
 
   @override
   State<Homepage> createState() => _HomepageState();
@@ -41,9 +47,24 @@ class _HomepageState extends State<Homepage> {
     for (AccountType a in AccountType.values){
       favoriteAcc[a] = accountBox.values.firstWhereOrNull((e) => e.type == a );
     }
+
+    HardwareScanner.getInstance().addListener(_onHardwareScan);
+
     super.initState();
   }
 
+  @override
+  void dispose() {
+    HardwareScanner.getInstance().removeListener(_onHardwareScan);
+    super.dispose();
+  }
+
+  void _onHardwareScan(ScannerCallbackData data){
+    if (widget.isSelected && Get.currentRoute == "/" && !(Get.isDialogOpen??false)){
+      Get.snackbar(data.success.toString(), data.code??"no data");
+      print(data.success);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,12 +76,12 @@ class _HomepageState extends State<Homepage> {
           for (AccountType a in AccountType.values){
           favoriteAcc[a] = accountBox.values.firstWhereOrNull((e) => e.type == a );
           }
-          if (favoriteAcc[AccountType.homebox] != null){
-          Account hbAcc = favoriteAcc[AccountType.homebox]!;
+          if (true || favoriteAcc[AccountType.homebox] != null){
+          //Account hbAcc = favoriteAcc[AccountType.homebox]!;
 
-          return FutureBuilder<String>(future: HomeboxApi.getByAccount(hbAcc).queryEntitiesRaw(isLocation: true, filterChildren: true), builder: (context, AsyncSnapshot<String> snap){
+          return FutureBuilder<AndroidDeviceInfo>(future: (DeviceInfoPlugin().androidInfo), builder: (context, AsyncSnapshot<AndroidDeviceInfo> snap){
           if (snap.hasData) {
-          return Center(child: Text(snap.data!),);
+          return Center(child: Text(snap.data!.manufacturer),);
           }
 
           if (snap.hasError) {

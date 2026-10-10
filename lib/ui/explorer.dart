@@ -8,9 +8,12 @@ import 'package:scanbox_connect/api/homebox.dart';
 
 import 'package:scanbox_connect/models/account.dart';
 import 'package:scanbox_connect/models/homebox.dart';
+import 'package:scanbox_connect/models/scanner.dart';
+import 'package:scanbox_connect/platform/hardware_scanner.dart';
 
 class ExplorerPage extends StatefulWidget {
-  const ExplorerPage({super.key});
+  final bool isSelected;
+  const ExplorerPage({required this.isSelected, super.key});
 
   @override
   State<ExplorerPage> createState() => _ExplorerPageState();
@@ -20,13 +23,31 @@ class _ExplorerPageState extends State<ExplorerPage> {
   Box<Account> accountBox = Hive.box<Account>("accounts");
   late final ValueListenable<Box<Account>> _listenable;
 
-  final _breadcrumbsScrollController = ScrollController();
-
   Map<AccountType, Account?> favoriteAcc = {};
   Account? hbAcc;
   HomeboxApi? hbApi;
 
   RxList<Entity> path = <Entity>[].obs;
+
+  @override
+  void initState() {
+    handleAccountUpdate();
+
+    _listenable = accountBox.listenable();
+    _listenable.addListener(handleAccountUpdate);
+
+    HardwareScanner.getInstance().addListener(_onHardwareScan);
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _listenable.removeListener(handleAccountUpdate);
+    HardwareScanner.getInstance().removeListener(_onHardwareScan);
+    super.dispose();
+  }
+
 
   void handleAccountUpdate(){
     for (AccountType a in AccountType.values){
@@ -40,20 +61,8 @@ class _ExplorerPageState extends State<ExplorerPage> {
     setState(() {});
   }
 
-  @override
-  void initState() {
-    handleAccountUpdate();
+  void _onHardwareScan(ScannerCallbackData data){
 
-    _listenable = accountBox.listenable();
-    _listenable.addListener(handleAccountUpdate);
-
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _listenable.removeListener(handleAccountUpdate);
-    super.dispose();
   }
 
   Future<(QueryResponse, QueryResponse?)> queryFuture(){
@@ -63,7 +72,6 @@ class _ExplorerPageState extends State<ExplorerPage> {
         Future.value(null)
       ).wait;
     } else {
-      print(path.last.name);
       return (
         hbApi!.queryEntities(parentIds: [path.last.id], isLocation: true),
         hbApi!.queryEntities(parentIds: [path.last.id], isLocation: false)

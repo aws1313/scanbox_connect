@@ -25,6 +25,7 @@ import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scanbox_connect/hive/hive_registrar.g.dart';
 import 'package:scanbox_connect/models/account.dart';
+import 'package:scanbox_connect/platform/hardware_scanner.dart';
 import 'package:scanbox_connect/ui/root_layout.dart';
 import 'package:path/path.dart' as p;
 
@@ -32,12 +33,13 @@ void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
+  // setup logger
   Logger.root.level = Level.ALL; // defaults to Level.INFO
   Logger.root.onRecord.listen((record) {
     print('${record.level.name}: ${record.time}: ${record.message}');
   });
 
-
+  // setup hive
   if (GetPlatform.isMacOS) {
     Hive
       ..init(
@@ -49,6 +51,10 @@ void main() async {
   }
   await Hive.openBox<Account>("accounts");
 
+  // setup hardware scanner
+  await HardwareScanner.prepareSupportedScanner();
+
+  // start app
   FlutterNativeSplash.remove();
   runApp(const ScanboxConnect());
 }

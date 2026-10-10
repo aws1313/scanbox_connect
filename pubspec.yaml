@@ -23,6 +23,8 @@ dependencies:
   uuid: ^4.6.0
   collection: ^1.19.1
   device_info_plus: ^13.2.0
+  package_info_plus: ^10.2.2
+  dart_flutter_version: ^1.0.56
 
   # network and internet stuff
   dio: ^5.10.0

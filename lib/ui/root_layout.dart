@@ -42,12 +42,6 @@ class _RootLayoutState extends State<RootLayout> {
 
     super.initState();
   }
-
-
-  List<Widget> pages = [
-    Homepage(),
-    ExplorerPage(),
-  ];
   
   AppBar get appBar => AppBar(
     actions: [
@@ -78,7 +72,10 @@ class _RootLayoutState extends State<RootLayout> {
       floatingActionButton: fab,
       body: IndexedStack(
       index: _selectedPage,
-      children: pages,
+      children: [
+        Homepage(isSelected: _selectedPage == 0),
+        ExplorerPage(isSelected: _selectedPage == 1),
+      ],
       )
     );
   }

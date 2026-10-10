@@ -16,12 +16,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import 'package:dart_flutter_version/dart_flutter_version.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:get/get.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:hive_ce_flutter/adapters.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:scanbox_connect/models/account.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -44,6 +46,19 @@ class SettingsPage extends StatelessWidget {
               icon: Icon(Icons.info),
               applicationName: "ScanboxConnect",
               child: Text("Über ScanboxConnect und Kontaktdaten (Impressum)"),
+              aboutBoxChildren: [
+                FutureBuilder<PackageInfo>(
+                    future: PackageInfo.fromPlatform(), 
+                    builder: (BuildContext context, AsyncSnapshot<PackageInfo> snap){
+                      if (snap.hasData){
+                        return Text("Software version: ${snap.data!.version}");
+                      }
+                      return CircularProgressIndicator();
+                    }
+                ),
+                Text("Flutter version: ${DartFlutterVersion().flutterVersion}"),
+                Text("Dart version: ${DartFlutterVersion().dartVersion}")
+              ],
             )
           ],
         )
