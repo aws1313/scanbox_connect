@@ -52,7 +52,7 @@ dev_dependencies:
   hive_ce_generator: ^1.11.1
   build_runner: ^2.15.0
   json_serializable: ^6.10.0
-  freezed: ^3.2.5
+  freezed: ^4.0.3
 
 
 flutter:
