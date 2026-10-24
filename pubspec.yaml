@@ -40,7 +40,7 @@ dependencies:
   honeywell_scanner: ^8.0.0
 
   # ui
-  cupertino_icons: ^1.0.8
+  cupertino_icons: ^2.0.0
 
 dev_dependencies:
   flutter_test:
